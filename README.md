@@ -13,9 +13,10 @@ INSERT INTO settings SET `id` = 8, `name` = 'EnableAbnormalActivityAlertEmail', 
 * app/mailers/mailer.rb at bottom
 ```ruby
 # IM-86 => Added mailer to send Email alert for Abnormal Activity - EL - 20180226 .ns
-def abnormal_activity_notifier(shipment)
+def abnormal_activity_notifier(shipment,milestone_count)
     @shipment = shipment
-    subject = "Abnormal Activity detected for Shipment #{shipment.srf}" 
+    @milestone_count = milestone_count
+    subject = "EFM Runaway Activity Alert SRF #{shipment.srf}" 
     mail(:to => MONITORING_ALERT_EMAIL, :subject => subject)
   end
 # IM-86 => Added mailer to send Email alert for Abnormal Activity - EL - 20180226 .ne
@@ -24,11 +25,7 @@ def abnormal_activity_notifier(shipment)
 3. Create the mail body text, a new file should be created on app/views/mailer/abnormal_activity_notifier.text.erb
 
 ```
-The shipment with SRF, <%= @shipment.srf %> has reported abnormal activity on EFM
-
-There are over 10 milestones registered for this shipment. Please review
-
-Thank you and have a great day!
+Monitoring alert has identified a potential runaway issue for EFM on SRF <%= @shipment.srf %>. A total of <%= @milestone_count %> milestones have been recorded
 
 ----
 regards,
@@ -43,7 +40,7 @@ EFM team
 # IM-86 => Added count and setting validations to send Email alert for Abnormal Activity - EL - 20180226 .ns
 milestone_count = Milestone.count(:conditions => "shipment_id = #{shipment.id}")
 if milestone_count > 10
-  setting = Setting.find_by_name('EnableAbnormalActivityAlertEmail')
+  setting = Setting.find_by_name('EnableAbnormalActivityAlertEmail', milestone_count)
   if setting && setting.value == "1"
     Mailer.abnormal_activity_notifier(shipment).deliver
   end
