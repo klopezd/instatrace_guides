@@ -65,7 +65,7 @@ permit_params :first_name, :last_name, :email, :address, :phone, :login, :activa
 * app/views/active_admin/users/_form.html.erb near ln 20
 ```html
 <!-- IM-86 => Added new input combo for disabled/enabled user - EL - 20180226 .ns -->
-<%= f.input :is_enabled, :as => :select,:collection => User.enable, :include_blank => false %>
+<%= f.input :is_enabled, :as => :select, :include_blank => false %>
 <!-- IM-86 => Added new input combo for disabled/enabled user - EL - 20180226 .ne -->
 ```
 4. Add validations on get_session and activation functions to avoid disabled users to use the token
