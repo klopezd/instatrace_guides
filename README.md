@@ -3,14 +3,16 @@ Guides for change request
 
 ## IM-86
 
-### Runaway activity alert - EFM
+### Runaway activity alert
 1. Insert new setting on DB
 ```SQL
 INSERT INTO settings SET `id` = 8, `name` = 'EnableAbnormalActivityAlertEmail', `value` = '1', `description` = 'Enable Abnormal Activity Alert Email (Turn on: 1: Turn Off: 0)', `created_at` = '2018-02-25 16:51:25', `updated_at` = '2018-02-25 16:51:25';
 ```
 
-2. Create the new Mailer function 
+2. Create the new Mailer function
 * app/mailers/mailer.rb at bottom
+
+*EFM* 
 ```ruby
 # IM-86 => Added mailer to send Email alert for Abnormal Activity - EL - 20180226 .ns
 def abnormal_activity_notifier(shipment,milestone_count)
@@ -21,9 +23,20 @@ def abnormal_activity_notifier(shipment,milestone_count)
   end
 # IM-86 => Added mailer to send Email alert for Abnormal Activity - EL - 20180226 .ne
 ```
+*EFW/TransPak* 
+```ruby
+# IM-86 => Added mailer to send Email alert for Abnormal Activity - EL - 20180226 .ns
+def abnormal_activity_notifier(shipment,milestone_count)
+    @shipment = shipment
+    @milestone_count = milestone_count
+    subject = "EFW Runaway Activity Alert SRF #{shipment.hawb}" 
+    mail(:to => MONITORING_ALERT_EMAIL, :subject => subject)
+  end
+# IM-86 => Added mailer to send Email alert for Abnormal Activity - EL - 20180226 .ne
+```
 
 3. Create the mail body text, a new file should be created on app/views/mailer/abnormal_activity_notifier.text.erb
-
+*EFM*
 ```
 Monitoring alert has identified a potential runaway issue for EFM on SRF <%= @shipment.srf %>. A total of <%= @milestone_count %> milestones have been recorded
 
@@ -32,13 +45,22 @@ regards,
 EFM team
 
 ```
+*EFW/TransPak*
+```
+Monitoring alert has identified a potential runaway issue for EFW on HAWB <%= @shipment.hawb %>. A total of <%= @milestone_count %> milestones have been recorded
+
+----
+regards,
+EFW team
+
+```
 
 4. Count the milestones inserted for the current shipment. Then add setting validation to Mass_Update workflow and mailer alert.
 * app/controllers/api/shipments_controller.rb near ln 331
 
 ```ruby
 # IM-86 => Added count and setting validations to send Email alert for Abnormal Activity - EL - 20180226 .ns
-milestone_count = Milestone.count(:conditions => "shipment_id = #{shipment.id}")
+milestone_count = Milestone.where(:shipment_id => shipment.id).count
 if milestone_count > 10
   setting = Setting.find_by_name('EnableAbnormalActivityAlertEmail')
   if setting && setting.value == "1"
@@ -47,6 +69,7 @@ if milestone_count > 10
 end
 # IM-86 => Added count and setting validations to send Email alert for Abnormal Activity - EL - 20180226 .ne
 ```
+
 ### Deactivate user function - EFM/EFW/TPK
 1. Insert new column on the User's table
 ```SQL
