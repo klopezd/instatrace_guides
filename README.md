@@ -56,18 +56,26 @@ EFW team
 ```
 
 4. Count the milestones inserted for the current shipment. Then add setting validation to Mass_Update workflow and mailer alert.
-* app/controllers/api/shipments_controller.rb near ln 331
+* app/controllers/api/shipments_controller.rb near ln 595 before render :json => {:status => true, :message => t('messages.notice.milestone_created_ok')}
 
 ```ruby
-# IM-86 => Added count and setting validations to send Email alert for Abnormal Activity - EL - 20180226 .ns
-milestone_count = Milestone.where(:shipment_id => shipment.id).count
-if milestone_count > 10
-  setting = Setting.find_by_name('EnableAbnormalActivityAlertEmail')
-  if setting && setting.value == "1"
-    Mailer.abnormal_activity_notifier(shipment, milestone_count).deliver
+# IM-86 => Added count and setting validations to send Email alert for Abnormal Activity    - EL - 20180226 .ns
+data.each do |shipment_data|
+  begin
+    shipment = Shipment.api_search(shipment_data["shipment"])
+    milestone_count = Milestone.where(:shipment_id => shipment.id).count
+    if milestone_count > 10
+        setting = Setting.find_by_name('EnableAbnormalActivityAlertEmail')
+        if setting && setting.value == "1"
+          Mailer.abnormal_activity_notifier(shipment, milestone_count).deliver
+        end
+    end
+  rescue Exception => e
+    Rails.logger.error "#{Time.now} - Error on AbnormalActivityAlert : #{e.inspect}"
+    Rails.logger.error "#{Time.now} - Error on AbnormalActivityAlert : #{e.backtrace.inspect}"
   end
 end
-# IM-86 => Added count and setting validations to send Email alert for Abnormal Activity - EL - 20180226 .ne
+# IM-86 => Added count and setting validations to send Email alert for Abnormal Activity- EL - 20180226 .ne
 ```
 
 ### Deactivate user function - EFM/EFW/TPK
