@@ -82,13 +82,13 @@ end
 1. Insert new column on the User's table
 ```SQL
 ALTER TABLE `instatrace`.`users` 
-ADD COLUMN `is_enabled` VARCHAR(255) NULL DEFAULT 'true' AFTER `is_activated`,
+ADD COLUMN `is_disabled` VARCHAR(255) NULL DEFAULT 'false' AFTER `is_activated`,
 ```
-2. Add new param ":is_enabled" to the permit_params line
+2. Add new param ":is_disabled" to the permit_params line
 * app/admin/user.rb near ln 22
 ```ruby
 # IM-86 => Added new param for disabled/enabled user - EL - 20180226 .ns
-permit_params :first_name, :last_name, :email, :address, :phone, :login, :activation_code, :password, :password_confirmation, :language, :role_id, :is_enabled
+permit_params :first_name, :last_name, :email, :address, :phone, :login, :activation_code, :password, :password_confirmation, :language, :role_id, :is_disabled
 # IM-86 => Added new param for disabled/enabled user - EL - 20180226 .ne
 ```
 
@@ -96,7 +96,7 @@ permit_params :first_name, :last_name, :email, :address, :phone, :login, :activa
 * app/views/active_admin/users/_form.html.erb near ln 20
 ```html
 <!-- IM-86 => Added new input combo for disabled/enabled user - EL - 20180226 .ns -->
-<%= f.input :is_enabled, :as => :select, :include_blank => false %>
+<%= f.input :is_disabled, :label => 'Deactivate User', :as => :select, :include_blank => false %>
 <!-- IM-86 => Added new input combo for disabled/enabled user - EL - 20180226 .ne -->
 ```
 4. Add validations on get_session and activation functions to avoid disabled users to use the token
@@ -104,7 +104,7 @@ permit_params :first_name, :last_name, :email, :address, :phone, :login, :activa
 ```ruby
 # IM-86 => Added new token validation for disabled/enabled user - EL - 20180226 .ns
 if user
-  if user.is_enabled == 'true'
+  if user.is_disabled == 'false'
     user.generate_token! if user.id != WORDTRAK_POST_SHIPMENT_USER_ID
     render :json => {:token => user.api_token}.to_json
   else
@@ -120,7 +120,7 @@ end
 ```ruby
 # IM-86 => Added new token validation for disabled/enabled user - EL - 20180226 .ns
 if @user
-  if @user.is_enabled == 'true'
+  if @user.is_disabled == 'false'
     sign_in :user, @user
   else
     render :status => 401, :json => { :errors => "Invalid token" } and return
@@ -136,7 +136,7 @@ end
 # IM-86 => Added new token validation for disabled/enabled user - EL - 20180226 .ns
 def get_shipment
   @user = User.find_by_api_token params[:token] unless params[:token].blank?
-  if @user.is_enabled == 'true'
+  if @user.is_disabled == 'false'
      mobile_version = params[:mobile_ver] unless params[:mobile_ver].blank?
      if !check_latest_mobile(mobile_version) or params[:mobile_ver].blank?
         render :status => 406, :json => {:errors => "Need upgraded"}.to_json and return
