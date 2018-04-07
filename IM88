@@ -1,0 +1,31 @@
+## IM-88
+
+### Forbid access to two devices at the same tiempo
+**1. Modify validation on Activation function**
+* _app/controllers/api/api_controller.rb on def activation first if_
+
+```ruby
+if user
+  if user.is_activated == 'N' #IM-88 => Added validation for not activating two devices - EL - 20180406.n
+    if user.is_disabled == 'false'
+      user.generate_token! if user.id != WORDTRAK_POST_SHIPMENT_USER_ID
+      render :json => {:token => user.api_token}.to_json
+    else
+      render :status => 402, :json => {:errors => "Invalid activation code"}.to_json and return
+    end
+    #IM-88 => Added validation for not activating two devices - EL - 20180406 .ns
+  else
+    render :status => 401, :json => { :errors => "Invalid token" } and return
+  end
+  #IM-88 => Added validation for not activating two devices - EL - 20180406 .ns
+else
+  render :status => 402, :json => {:errors => "Invalid activation code"}.to_json and return
+end
+```
+
+**2. Modify update definition on user controller**
+* _app/controllers/users_controller.rb inside def update_
+ 
+```ruby
+sd
+```
