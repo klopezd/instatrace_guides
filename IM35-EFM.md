@@ -199,7 +199,7 @@ vim /rails.root/app/views/mailer/request_500_error_alert.text.erb
 ```
 
 ```
-A 500 error has been returned from a incoming request for EFW
+A 500 error has been returned from a incoming request for EFM
 
 Error: <%= @error_msg %>
 
