@@ -173,20 +173,26 @@ Rails.logger.info "upload_pod_document #{{"HAWB" => hawb, "DocumentDataBase64" =
 
 ### Error 500 Mailer
 
-**1. Create the new Mailer function**
+**1. Insert new setting on DB**
+```SQL
+INSERT INTO settings SET `name` = 'EnableError500Alert', `value` = '1', `description` = 'Enable Error 500 Alert Email (Turn on: 1: Turn Off: 0)', `created_at` = '2018-06-04 13:25:25', `updated_at` = '2018-06-04 13:25:25';
+
+```
+
+**2. Create the new Mailer function**
 * _rails.root/app/mailers/mailer.rb at bottom_
 
 ```ruby
 #.ns IM-35  30/11/2017  Luis Luna
 def request_500_error_alert (error_msg,body)
-  subject = "Error 500 returned for request on test EFW"
+  subject = "Error 500 returned for request on test EFM"
   @error_msg = error_msg
   @body = body
-  mail(:to => EMAIL_NOTIFY_POST_SHIPMENT_API, :subject => subject)
+  mail(:to => MONITORING_ALERT_EMAIL, :subject => subject)
 end #.ne 
 ```
 
-**2. Create the mail body text**
+**3. Create the mail body text**
 * _rails.root/app/views/mailer/request_500_error_alert.text.erb_
 
 ```
@@ -205,7 +211,7 @@ EFW Team
 
 ```
 
-**3. Call new mailer if Transaction on mass_update fails**
+**4. Call new mailer if Transaction on mass_update fails**
 * _rails.root/app/controllers/api/shipments_controller.rb_
 
 *Right after (near ln 621): *
@@ -219,5 +225,10 @@ rescue ActiveRecord::StatementInvalid, Exception => e
 ```
 *Add: *
 ```ruby
-Mailer.request_500_error_alert(e.backtrace.inspect,params).deliver #IM-35 Added mailer for 500 error 30/11/2018 LL .n
+ #IM-35: Added email alert for 500 errors - EL - 20180624 .ns
+setting = Setting.find_by_name('EnableWTUpdateStatus')
+if setting && setting.value == '1'
+   Mailer.request_500_error_alert(e.backtrace.inspect,params).deliver
+end
+#IM-35: Added email alert for 500 errors - EL - 20180624 .ne
 ```
