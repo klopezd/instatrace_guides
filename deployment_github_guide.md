@@ -29,9 +29,13 @@ ln -s /var/www/efw/shared/config/environments config/environments
 ln -s /var/www/efw/shared/config/shards.ymlg config/shards.yml
 ln -s /var/www/efw/shared/config/initializers/init_vars.rb config/initializers/init_vars.rb
 ```
-*Remove a folder
+*Folder actions
 ```
+#Remove
 rm -rf folderName
+
+#Copy
+ cp -R SorucefolderName /var/www/Destination
 ```
 
 **4. Activate the Ruby version**
