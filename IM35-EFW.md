@@ -185,7 +185,7 @@ INSERT INTO settings SET `name` = 'EnableError500Alert', `value` = '1', `descrip
 ```ruby
 #.ns IM-35  30/11/2017  Luis Luna
 def request_500_error_alert (error_msg,body)
-  subject = "Error 500 returned for request on test EFM"
+  subject = "Instatrace for EFW - 500 Error"
   @error_msg = error_msg
   @body = body
   mail(:to => MONITORING_ALERT_EMAIL, :subject => subject)
@@ -226,7 +226,7 @@ rescue ActiveRecord::StatementInvalid, Exception => e
 *Add: *
 ```ruby
  #IM-35: Added email alert for 500 errors - EL - 20180624 .ns
-setting = Setting.find_by_name('EnableWTUpdateStatus')
+setting = Setting.find_by_name('EnableError500Alert')
 if setting && setting.value == '1'
    Mailer.request_500_error_alert(e.backtrace.inspect,params).deliver
 end
