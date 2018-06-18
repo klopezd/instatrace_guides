@@ -188,7 +188,9 @@ _the terminal will ask for username and password for GitHub_
 
 ```
 git branch feature/IM-35
+git fetch
 git branch --set-upstream-to=origin/feature/IM-35 feature/IM-35
 git checkout feature/IM-35
 git pull
 ``
+_In case any file provokes a failure for being ahead of master, checkout the file and pull again_
