@@ -1,6 +1,6 @@
-## Deployment Guide from Github into a new deployment folder for the first time
+## Deployment Guide from Github on EFW
 
-### Change the Connection and AJAX handlers
+### Creating a new release folder and cloning for the first time
 
 **1. Create a new folder inside the releases folder**
 * _/var/www/instance/_
@@ -157,7 +157,7 @@ crontab -e
 ```
 *After this rerun step 8*
 
-## Deployment Guide from Github into a existing deployment folder
+### Performing a pull request from a release folder cloned previously
 
 **1. On local repository create a new feature/hotfix/release branch**
 * _on local repositiry root_
