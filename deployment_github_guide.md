@@ -171,26 +171,44 @@ git flow feature start IM-35
 
 ```
 git add -A
-git commit -m "IM-35: Description of changes"
+git commit -m "Ticket: Description of changes"
 ```
 
 **3. Push our feature/hotfix/release branch to GitHub**
 * _on local repositiry root_
 
 ```
-git push -u origin feature/IM-35
+git push -u origin feature/branchName
 ```
 _the terminal will ask for username and password for GitHub_
 
 
 **4. On target server, create the new branch and pull it from github**
+* _on target repository root_
+
+```
+git branch feature/branchName
+git fetch
+git branch --set-upstream-to=origin/feature/branchName feature/branchName
+git checkout feature/branchName
+git pull
+```
+_In case any file provokes a failure for being ahead of master, checkout the file and pull again_
+
+**5. After validations and testing is performed, close the feature branch on local repository and release it, then push it to GitHub**
 * _on local repositiry root_
 
 ```
-git branch feature/IM-35
-git fetch
-git branch --set-upstream-to=origin/feature/IM-35 feature/IM-35
-git checkout feature/IM-35
+git flow feature finish branchName
+git flow release start versionTag
+git flow release finish versionTag
+gut push -u origin master
+```
+
+**6. On target server, checkout to master branch and perform a pull from github**
+* _on target repository root_
+
+```
+git checkout master
 git pull
-``
-_In case any file provokes a failure for being ahead of master, checkout the file and pull again_
+```
