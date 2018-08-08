@@ -9,7 +9,7 @@
 mkdir YYYYMMddHHmmss
 ```
 
-** 2. Navigate to the folder and clone the git repository **
+**2. Navigate to the folder and clone the git repository**
 * _/var/www/instance/releases/_
 
 ```
@@ -140,7 +140,7 @@ passenger-status
 
 ```
 
-**8. IF NOT IMPLEMENTED: Edit Cronjobs to run under the current folder instead of "dated" deployment folder**
+**9. IF NOT IMPLEMENTED: Edit Cronjobs to run under the current folder instead of "dated" deployment folder**
 _/var/www/instance/current_
 
 ```
@@ -183,7 +183,7 @@ git push -u origin feature/branchName
 _the terminal will ask for username and password for GitHub_
 
 
-**4. On target server, create the new branch and pull it from github**
+**4. On production server, create the new branch and pull it from github**
 * _on target repository root_
 
 ```
@@ -195,7 +195,7 @@ git pull
 ```
 _In case any file provokes a failure for being ahead of master, checkout the file and pull again_
 
-**5. After validations and testing is performed, close the feature branch on local repository and release it, then push it to GitHub**
+**5.1.0. After validations and testing is performed, if changes are valid, close the feature branch on local repository and release it, then push it to GitHub**
 * _on local repositiry root_
 
 ```
@@ -205,10 +205,26 @@ git flow release finish versionTag
 gut push -u origin master
 ```
 
-**6. On target server, checkout to master branch and perform a pull from github**
+**5.1.1. On production server, checkout to master branch and perform a pull from github**
 * _on target repository root_
 
 ```
 git checkout master
+git pull
+```
+
+
+**5.2. After validations and testing is performed, if changes are not valid, checkout to master on the production server**
+* _on local repositiry root_
+
+```
+git checkout master
+```
+
+**5.2.2. Repeat steps 2 & 3, then checkout to the feature branch perform a pull on the production server. Repeat from step 5.1 or 5.2**
+* _on target repository root_
+
+```
+git checkout feature/branchName
 git pull
 ```
